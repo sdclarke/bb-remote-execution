@@ -3,6 +3,7 @@ load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
 go_library(
     name = "go_default_library",
     srcs = [
+        "executable_path_resolving_runner.go",
         "local_runner.go",
         "local_runner_rss_bytes.go",
         "local_runner_rss_kibibytes.go",
@@ -33,11 +34,18 @@ go_library(
 
 go_test(
     name = "go_default_test",
-    srcs = ["local_runner_test.go"],
+    srcs = [
+        "executable_path_resolving_runner_test.go",
+        "local_runner_test.go",
+    ],
     embed = [":go_default_library"],
     deps = [
+        "//internal/mock:go_default_library",
         "//pkg/proto/runner:go_default_library",
         "@com_github_buildbarn_bb_storage//pkg/filesystem:go_default_library",
+        "@com_github_golang_mock//gomock:go_default_library",
         "@com_github_stretchr_testify//require:go_default_library",
+        "@org_golang_google_grpc//codes:go_default_library",
+        "@org_golang_google_grpc//status:go_default_library",
     ],
 )

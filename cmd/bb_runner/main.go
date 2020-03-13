@@ -4,6 +4,8 @@ import (
 	"context"
 	"log"
 	"os"
+	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/buildbarn/bb-remote-execution/pkg/proto/configuration/bb_runner"
@@ -36,10 +38,38 @@ func main() {
 		log.Fatal("Failed to open build directory: ", err)
 	}
 
-	r := runner.NewLocalRunner(
-		buildDirectory,
-		configuration.BuildDirectoryPath,
-		configuration.SetTmpdirEnvironmentVariable)
+	rootDirectoryOpener := func(inputRootDirectory string) (filesystem.DirectoryCloser, error) {
+		var dir filesystem.DirectoryCloser
+		if configuration.ChrootIntoInputRoot {
+			components := strings.FieldsFunc(inputRootDirectory, func(r rune) bool { return r == '/' })
+			dir = buildDirectory
+			for n, component := range components {
+				dir2, err := dir.EnterDirectory(component)
+				if err != nil {
+					return nil, util.StatusWrapf(err, "Failed to enter directory %#v", filepath.Join(components[:n+1]...))
+				}
+				if dir != buildDirectory {
+					dir.Close()
+				}
+				dir = dir2
+			}
+		} else {
+			binDir, err := filesystem.NewLocalDirectory("/")
+			if err != nil {
+				return nil, err
+			}
+			dir = binDir
+		}
+		return dir, nil
+	}
+
+	r := runner.NewExecutablePathResolvingRunner(
+		runner.NewLocalRunner(
+			buildDirectory,
+			configuration.BuildDirectoryPath,
+			configuration.SetTmpdirEnvironmentVariable,
+			configuration.ChrootIntoInputRoot),
+		rootDirectoryOpener)
 
 	// When temporary directories need cleaning prior to executing a build
 	// action, attach a series of TemporaryDirectoryCleaningRunners.

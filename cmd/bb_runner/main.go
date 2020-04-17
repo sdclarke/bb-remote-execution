@@ -38,11 +38,11 @@ func main() {
 		log.Fatal("Failed to open build directory: ", err)
 	}
 
-	rootDirectoryOpener := func(inputRootDirectory string) (filesystem.DirectoryCloser, error) {
-		var dir filesystem.DirectoryCloser
-		if configuration.ChrootIntoInputRoot {
+	var rootDirectoryOpener runner.RootDirectoryOpener
+	if configuration.ChrootIntoInputRoot {
+		rootDirectoryOpener = func(inputRootDirectory string) (filesystem.DirectoryCloser, error) {
 			components := strings.FieldsFunc(inputRootDirectory, func(r rune) bool { return r == '/' })
-			dir = buildDirectory
+			dir := buildDirectory
 			for n, component := range components {
 				dir2, err := dir.EnterDirectory(component)
 				if err != nil {
@@ -53,14 +53,16 @@ func main() {
 				}
 				dir = dir2
 			}
-		} else {
-			binDir, err := filesystem.NewLocalDirectory("/")
+			return filesystem.NopDirectoryCloser(dir), nil
+		}
+	} else {
+		rootDirectoryOpener = func(inputRootDirectory string) (filesystem.DirectoryCloser, error) {
+			dir, err := filesystem.NewLocalDirectory("/")
 			if err != nil {
 				return nil, err
 			}
-			dir = binDir
+			return filesystem.NopDirectoryCloser(dir), nil
 		}
-		return dir, nil
 	}
 
 	r := runner.NewExecutablePathResolvingRunner(

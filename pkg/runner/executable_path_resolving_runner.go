@@ -75,7 +75,7 @@ func (r *executablePathResolvingRunner) findExecutable(file, chroot string) erro
 		if err != nil {
 			return err
 		}
-		if filepath.Dir(link) != filepath.Dir(file) {
+		if strings.ContainsRune(link, '/') && filepath.Dir(link) != filepath.Dir(file) {
 			dir, err = r.enterDir(link, chroot)
 			if err != nil {
 				return err

@@ -32,12 +32,12 @@ type localBuildExecutor struct {
 	clock                     clock.Clock
 	defaultExecutionTimeout   time.Duration
 	maximumExecutionTimeout   time.Duration
-	devices                   []filesystem.Device
+	devices                   []re_filesystem.Device
 }
 
 // NewLocalBuildExecutor returns a BuildExecutor that executes build
 // steps on the local system.
-func NewLocalBuildExecutor(contentAddressableStorage cas.ContentAddressableStorage, buildDirectoryCreator BuildDirectoryCreator, runner runner.Runner, clock clock.Clock, defaultExecutionTimeout time.Duration, maximumExecutionTimeout time.Duration, devices []filesystem.Device) BuildExecutor {
+func NewLocalBuildExecutor(contentAddressableStorage cas.ContentAddressableStorage, buildDirectoryCreator BuildDirectoryCreator, runner runner.Runner, clock clock.Clock, defaultExecutionTimeout time.Duration, maximumExecutionTimeout time.Duration, devices []re_filesystem.Device) BuildExecutor {
 	return &localBuildExecutor{
 		contentAddressableStorage: contentAddressableStorage,
 		buildDirectoryCreator:     buildDirectoryCreator,
@@ -254,7 +254,7 @@ func (be *localBuildExecutor) Execute(ctx context.Context, filePool re_filesyste
 	}
 
 	if be.devices != nil {
-		if err := filesystem.CreateDev(inputRootDirectory, be.devices); err != nil {
+		if err := re_filesystem.CreateDev(inputRootDirectory, be.devices); err != nil {
 			attachErrorToExecuteResponse(response, err)
 			return response
 		}

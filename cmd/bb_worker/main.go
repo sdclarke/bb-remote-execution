@@ -173,16 +173,15 @@ func main() {
 				log.Fatal("Failed to parse maximum execution timeout")
 			}
 
-			var devices []filesystem.Device
+			var devices []re_filesystem.Device
 			for _, device := range runnerConfiguration.Devices {
 				var stat unix.Stat_t
 				if err := unix.Stat(filepath.Join("/dev", device), &stat); err != nil {
 					log.Fatalf("Unable to stat device /dev/%#v", device)
 				}
-				devices = append(devices, filesystem.Device{
+				devices = append(devices, re_filesystem.Device{
 					Name: device,
 					Rdev: stat.Rdev,
-					Mode: os.FileMode(stat.Mode),
 				})
 			}
 

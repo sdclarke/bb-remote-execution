@@ -85,9 +85,12 @@ def go_dependencies():
     go_repository(
         name = "com_github_bazelbuild_remote_apis",
         importpath = "github.com/bazelbuild/remote-apis",
-        patches = ["@com_github_buildbarn_bb_storage//:patches/com_github_bazelbuild_remote_apis/golang.diff"],
-        sum = "h1:oGlwXSE0YtfF3lEpBXyZCyWWOzF2o/fz44uvNjrOzOA=",
-        version = "v0.0.0-20210301152524-6345202a036a",
+        patches = [
+            "@com_github_buildbarn_bb_storage//:patches/com_github_bazelbuild_remote_apis/blake3.diff",
+            "@com_github_buildbarn_bb_storage//:patches/com_github_bazelbuild_remote_apis/golang.diff"
+            ],
+        sum = "h1:/EMHYfINZDLrrr4f72+MxCYvmJ9EYcL8PYbQFHrnm38=",
+        version = "v0.0.0-20201209220655-9e72daff42c9",
     )
 
     go_repository(

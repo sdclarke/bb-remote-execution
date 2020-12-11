@@ -216,6 +216,7 @@ func main() {
 						globalContentAddressableStorage,
 						digest.KeyWithoutInstance,
 						uploadBatchSize)
+					contentAddressableStorageWriter = blobstore.NewDecomposingBlobAccess(contentAddressableStorageWriter, 8*1024, 8*1024*1024)
 					contentAddressableStorageWriter = blobstore.NewMetricsBlobAccess(
 						contentAddressableStorageWriter,
 						clock.SystemClock,
